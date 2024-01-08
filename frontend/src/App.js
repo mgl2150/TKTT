@@ -4,6 +4,8 @@ import "./App.css";
 function App() {
   const [quotes, setQuotes] = useState([]);
   const [searchAuthor, setSearchAuthor] = useState("");
+  const [searchQuote, setSearchQuote] = useState("");
+  const [filteredQuotes, setFilteredQuotes] = useState([]);
 
   useEffect(() => {
     fetchQuotes();
@@ -14,21 +16,27 @@ function App() {
       const response = await fetch("http://localhost:3001/api/quotes");
       const data = await response.json();
       setQuotes(data.quotes);
+      setFilteredQuotes(data.quotes);
     } catch (error) {
       console.error("Error fetching quotes:", error);
     }
   };
 
   const handleSearch = () => {
-    const filteredQuotes = quotes.filter((quote) =>
-      quote.author.toLowerCase().includes(searchAuthor.toLowerCase())
+    const termAuthor = searchAuthor.toLowerCase();
+    const termQuote = searchQuote.toLowerCase();
+    const filtered = quotes.filter(
+      (quote) =>
+        quote.author.toLowerCase().includes(termAuthor) &&
+        quote.quote.toLowerCase().includes(termQuote)
     );
-    setQuotes(filteredQuotes);
+    setFilteredQuotes(filtered);
   };
 
   const handleResetSearch = () => {
     setSearchAuthor("");
-    fetchQuotes();
+    setSearchQuote("");
+    setFilteredQuotes(quotes); 
   };
 
   return (
@@ -42,11 +50,17 @@ function App() {
           value={searchAuthor}
           onChange={(e) => setSearchAuthor(e.target.value)}
         />
+        <input
+          type="text"
+          placeholder="Search by quote"
+          value={searchQuote}
+          onChange={(e) => setSearchQuote(e.target.value)}
+        />
         <button onClick={handleSearch}>Search</button>
         <button onClick={handleResetSearch}>Reset Search</button>
       </div>
       <ul>
-        {quotes
+        {filteredQuotes
           .slice(0, 99)
           .map((quote, index) => (
             <li key={index}>
