@@ -16,7 +16,7 @@ function App() {
       const response = await fetch("http://localhost:3001/api/quotes");
       const data = await response.json();
       setQuotes(data.quotes);
-      setFilteredQuotes(data.quotes);
+      setFilteredQuotes(data.quotes); 
     } catch (error) {
       console.error("Error fetching quotes:", error);
     }
@@ -39,6 +39,18 @@ function App() {
     setFilteredQuotes(quotes); 
   };
 
+  const downloadJSON = () => {
+    const jsonContent = JSON.stringify(quotes);
+    const blob = new Blob([jsonContent], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "quotes.json");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div style={{ padding: "2rem" }}>
       <h1 style={{ padding: "1rem" }}>Quotes</h1>
@@ -58,6 +70,7 @@ function App() {
         />
         <button onClick={handleSearch}>Search</button>
         <button onClick={handleResetSearch}>Reset Search</button>
+        <button onClick={downloadJSON}>Download JSON</button>
       </div>
       <ul>
         {filteredQuotes
